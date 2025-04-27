@@ -134,42 +134,43 @@ curl 'http://127.0.0.1:8999/webhook?key=xxxxxx-xxxxx-xxxxx-xxxxxx-xxxxxxx'  -H '
 ### 3、使用alert内容指定微信机器人发送消息
 
 ```
-  curl 'http://127.0.0.1:8999/webhook'  -H 'Content-Type: application/json'    -d '
-  {
+curl 'http://127.0.0.1:8999/webhook' \
+  -H 'Content-Type: application/json' \
+  -d '{
     "receiver": "webhook-test",
     "status": "firing",
     "alerts": [
       {
         "status": "firing",
         "labels": {
-          "alertname": "test alert1",
-          "instance": "example1",
-          "severity": "critical"
+          "alertname": "HighSMSPerPrefixIn10Min",
+          "severity": "warning",
+          "type": "sms_flood",
+          "prefix": "00861867878"
         },
         "annotations": {
-          "info": "Test message,ignore",
-          "description": "This is test summary,ignore",
-          "summary": "This is test message,ignore"
+          "description": "手机号前缀 00861867878 在过去 10 分钟内发送短信 4 条，超过阈值 5 条",
+          "summary": "手机号前缀 00861867878 短时发送量过高"
         },
-        "startsAt": "2019-07-24T02:38:30.763785079Z",
-        "endsAt": "0001-01-01T00:00:00Z",
-        "generatorURL": "critical"
+        "startsAt": "2025-04-25T11:21:53Z",
+        "endsAt": "0001-01-01T00:00:00Z"
       }
     ],
     "groupLabels": {
-      "alertname": "test alert1"
+      "type": "sms_flood"
     },
     "commonLabels": {
-      "alertname": "test alert1",
-      "instance": "example1"
+      "alertname": "HighSMSPerPrefixIn10Min",
+      "severity": "warning",
+      "type": "sms_flood",
+      "prefix": "00861867878"
     },
     "commonAnnotations": {
-      "info": "Test message,ignore",
-      "summary": "This is test summary,ignore",
-      "wechatRobot": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxx-xxxxx-xxxxx-xxxxxx-xxxxxxx"
+      "description": "手机号前缀 00861867878 在过去 10 分钟内发送短信 4 条，超过阈值 5 条",
+      "summary": "手机号前缀 00861867878 短时发送量过高"
     },
     "externalURL": "http://localhost:9093",
     "version": "4",
-    "groupKey": "{}/{alertname=~\"^(?:test.*)$\"}:{alertname=\"test alert1\"}"
+    "groupKey": "{}/{type=\"sms_flood\"}:{alertname=\"HighSMSPerPrefixIn10Min\"}"
   }'
 ```

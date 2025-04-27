@@ -150,6 +150,7 @@ func sendToWeChat(content string, robotURL string, defaultRobot string) error {
 	}
 	defer resp.Body.Close()
 
+	fmt.Printf("The wechatRobotURL is : %s\n", wechatRobotURL)
 	// Print response for debugging
 	fmt.Println("response Status:", resp.Status)
 	fmt.Println("response Headers:", resp.Header)

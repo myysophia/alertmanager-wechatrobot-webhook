@@ -87,7 +87,7 @@ func HandleSMSPrefixBlock(prefix string) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("kong API request failed with status: %s", resp.Status)
 	}
-
+	fmt.Printf("Kong API request successful with status: %s\n", resp.Status)
 	return nil
 }
 
