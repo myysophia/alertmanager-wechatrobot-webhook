@@ -36,6 +36,20 @@ spec:
               memory: 1Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          env:
+            - name: GRAFANA_URL
+              value: "http://grafana:3000"
+            - name: ALERT_DOMAIN
+              value: "alertmanager"
+            - name: DEFAULT_ROBOT
+              value: "your-default-robot-key"
+            - name: KONG_API_ENDPOINT
+              value: "https://8.136.109.47"
+            - name: KONG_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kong-api-secret
+                  key: token
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

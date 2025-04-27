@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/k8stech/alertmanager-wechatrobot-webhook/model"
-	"github.com/k8stech/alertmanager-wechatrobot-webhook/transformer"
 	"net/http"
 	"strings"
+
+	"github.com/k8stech/alertmanager-wechatrobot-webhook/model"
+	"github.com/k8stech/alertmanager-wechatrobot-webhook/transformer"
 )
 
 // Send send markdown message to dingtalk
@@ -67,6 +68,25 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 	markdown, robotURL, err := transformer.TransformToMarkdown(notification, grafanaURL, alertDomain)
 	if err != nil {
 		return
+	}
+
+	// 检查是否是短信告警
+	if notification.GroupLabels["type"] == "sms_flood" {
+		// 遍历所有告警，查找包含prefix标签的告警
+		for _, alert := range notification.Alerts {
+			if prefix, ok := alert.Labels["prefix"]; ok && prefix != "" {
+				fmt.Printf("The prefix for kong is : %s\n", prefix)
+				// 调用Kong API进行封禁
+				if err := HandleSMSPrefixBlock(prefix); err != nil {
+					fmt.Printf("Failed to block SMS prefix: %v\n", err)
+				} else {
+					// 发送封禁成功通知
+					if err := SendBlockSuccessNotification(prefix, robotURL, defaultRobot); err != nil {
+						fmt.Printf("Failed to send block success notification: %v\n", err)
+					}
+				}
+			}
+		}
 	}
 
 	// Check the length of the generated markdown content
