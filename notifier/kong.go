@@ -6,15 +6,25 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 var (
 	kongAPIEndpoint string
+	defaultTimeout  int
 )
 
 func init() {
 	// 从环境变量读取配置，如果未设置则使用默认值
 	kongAPIEndpoint = getEnvOrDefault("KONG_API_ENDPOINT", "https://192.168.2.79:8003/request-limit/add")
+
+	// 从环境变量读取timeout配置，如果未设置则使用默认值600
+	timeoutStr := getEnvOrDefault("KONG_TIMEOUT", "600")
+	timeout, err := strconv.Atoi(timeoutStr)
+	if err != nil {
+		timeout = 600 // 如果转换失败，使用默认值
+	}
+	defaultTimeout = timeout
 }
 
 // getEnvOrDefault 从环境变量获取值，如果未设置则返回默认值
@@ -55,7 +65,7 @@ func HandleSMSPrefixBlock(prefix string) error {
 				}{
 					Prefix: prefix,
 				},
-				Timeout: 600,
+				Timeout: defaultTimeout,
 			},
 		},
 	}
@@ -97,7 +107,7 @@ func SendBlockSuccessNotification(prefix string, robotURL string, defaultRobot s
 	content := fmt.Sprintf("### 短信前缀封禁成功\n"+
 		"**前缀**: %s\n"+
 		"**操作**: 已成功添加到Kong封禁规则\n"+
-		"**封禁时长**: 600秒", prefix)
+		"**封禁时长**: %d秒", prefix, defaultTimeout)
 
 	return sendToWeChat(content, robotURL, defaultRobot)
 }
