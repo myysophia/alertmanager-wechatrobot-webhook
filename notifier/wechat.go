@@ -66,6 +66,7 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 
 	// Transform alert to markdown format
 	markdown, robotURL, err := transformer.TransformToMarkdown(notification, grafanaURL, alertDomain)
+	fmt.Printf("The robotURL is : %s\n", robotURL)
 	if err != nil {
 		return
 	}
