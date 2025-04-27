@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "master"
+      - "feature/kong"
     tags:
       - "*"  # 匹配所有的 tag 推送
 
