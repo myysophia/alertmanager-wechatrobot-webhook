@@ -72,7 +72,7 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 	}
 
 	// 检查是否是短信告警
-	if notification.GroupLabels["type"] == "sms_flood" {
+	if notification.Alerts[0].Labels["type"] == "sms_flood" {
 		// 遍历所有告警，查找包含prefix标签的告警
 		for _, alert := range notification.Alerts {
 			if prefix, ok := alert.Labels["prefix"]; ok && prefix != "" {
