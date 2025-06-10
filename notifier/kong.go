@@ -57,6 +57,7 @@ type KongRule struct {
 func HandleSMSPrefixBlock(prefix string, region string) error {
 	// 根据region获取对应的Kong API endpoint
 	endpoint, exists := regionEndpoints[region]
+	fmt.Printf("region is :%s ,kong address: %s\n", region, endpoint)
 	if !exists {
 		// 如果region不存在，使用默认endpoint
 		fmt.Printf("Warning: Unknown region %s, using default endpoint\n", region)
