@@ -73,21 +73,37 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 
 	// 检查是否是短信告警
 	if notification.Alerts[0].Labels["type"] == "sms_flood" {
-		// 遍历所有告警，查找包含prefix标签的告警
+		// 遍历所有告警
 		for _, alert := range notification.Alerts {
+			// 获取region，如果没有设置则使用默认值
+			region := alert.Labels["region"]
+			if region == "" {
+				region = "cn" // 设置默认region为cn
+			}
+
+			// 检查并处理prefix标签
 			if prefix, ok := alert.Labels["prefix"]; ok && prefix != "" {
 				fmt.Printf("The prefix for kong is : %s\n", prefix)
-				// 获取region，如果没有设置则使用默认值
-				region := alert.Labels["region"]
-				if region == "" {
-					region = "cn" // 设置默认region为cn
-				}
 				// 调用Kong API进行封禁
 				if err := HandleSMSPrefixBlock(prefix, region); err != nil {
 					fmt.Printf("Failed to block SMS prefix: %v\n", err)
 				} else {
 					// 发送封禁成功通知
 					if err := SendBlockSuccessNotification(prefix, robotURL, defaultRobot); err != nil {
+						fmt.Printf("Failed to send block success notification: %v\n", err)
+					}
+				}
+			}
+
+			// 检查并处理phone标签
+			if phone, ok := alert.Labels["phone"]; ok && phone != "" {
+				fmt.Printf("The phone number for kong is : %s\n", phone)
+				// 调用Kong API进行封禁
+				if err := HandleSMSPrefixBlock(phone, region); err != nil {
+					fmt.Printf("Failed to block SMS phone: %v\n", err)
+				} else {
+					// 发送封禁成功通知
+					if err := SendBlockSuccessNotification(phone, robotURL, defaultRobot); err != nil {
 						fmt.Printf("Failed to send block success notification: %v\n", err)
 					}
 				}
