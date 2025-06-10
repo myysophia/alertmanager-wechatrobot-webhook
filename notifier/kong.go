@@ -84,6 +84,8 @@ func HandleSMSPrefixBlock(value string, region string, blockType string) error {
 		return fmt.Errorf("marshal kong rule failed: %v", err)
 	}
 
+	fmt.Printf("Kong API request body: %s\n", string(data))
+
 	// 创建请求
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
 	if err != nil {
