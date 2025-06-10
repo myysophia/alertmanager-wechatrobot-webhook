@@ -53,8 +53,8 @@ type KongRule struct {
 	} `json:"rules"`
 }
 
-// HandleSMSPrefixBlock 处理短信前缀封禁逻辑
-func HandleSMSPrefixBlock(prefix string, region string) error {
+// HandleSMSPrefixBlock 处理短信前缀或手机号封禁逻辑
+func HandleSMSPrefixBlock(value string, region string, blockType string) error {
 	// 根据region获取对应的Kong API endpoint
 	endpoint, exists := regionEndpoints[region]
 	fmt.Printf("region is :%s ,kong address: %s\n", region, endpoint)
@@ -64,24 +64,16 @@ func HandleSMSPrefixBlock(prefix string, region string) error {
 		endpoint = kongAPIEndpoint
 	}
 
-	// 构建请求体
-	rule := KongRule{
-		Action: "add",
-		Rules: []struct {
-			Type string `json:"type"`
-			Rule struct {
-				Prefix string `json:"prefix"`
-			} `json:"rule"`
-			Timeout int `json:"timeout"`
-		}{
+	// 构建请求体，动态选择prefix或phone
+	rule := map[string]interface{}{
+		"action": "add",
+		"rules": []map[string]interface{}{
 			{
-				Type: "sms",
-				Rule: struct {
-					Prefix string `json:"prefix"`
-				}{
-					Prefix: prefix,
+				"type": "sms",
+				"rule": map[string]interface{}{
+					blockType: value,
 				},
-				Timeout: defaultTimeout,
+				"timeout": defaultTimeout,
 			},
 		},
 	}

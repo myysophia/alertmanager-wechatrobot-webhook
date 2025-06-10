@@ -83,9 +83,9 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 
 			// 检查并处理prefix标签
 			if prefix, ok := alert.Labels["prefix"]; ok && prefix != "" {
-				fmt.Printf("The prefix for kong is : %s ,region: %s\n", prefix, region)
-				// 调用Kong API进行封禁
-				if err := HandleSMSPrefixBlock(prefix, region); err != nil {
+				fmt.Printf("The prefix for kong is : %s\n", prefix)
+				// 调用Kong API进行封禁，blockType为prefix
+				if err := HandleSMSPrefixBlock(prefix, region, "prefix"); err != nil {
 					fmt.Printf("Failed to block SMS prefix: %v\n", err)
 				} else {
 					// 发送封禁成功通知
@@ -97,9 +97,9 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 
 			// 检查并处理phone标签
 			if phone, ok := alert.Labels["phone"]; ok && phone != "" {
-				fmt.Printf("The phone number for kong is : %s, region:%s \n", phone, region)
-				// 调用Kong API进行封禁
-				if err := HandleSMSPrefixBlock(phone, region); err != nil {
+				fmt.Printf("The phone number for kong is : %s\n", phone)
+				// 调用Kong API进行封禁，blockType为phone
+				if err := HandleSMSPrefixBlock(phone, region, "phone"); err != nil {
 					fmt.Printf("Failed to block SMS phone: %v\n", err)
 				} else {
 					// 发送封禁成功通知
