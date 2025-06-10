@@ -12,6 +12,13 @@ import (
 var (
 	kongAPIEndpoint string
 	defaultTimeout  int
+	regionEndpoints = map[string]string{
+		"us": "https://prometheus-kong-us.vnnox.com/request-limit/add",
+		"in": "https://prometheus-kong-in.vnnox.com/request-limit/add",
+		"eu": "https://prometheus-kong-eu.vnnox.com/request-limit/add",
+		"cn": "https://prometheus-kong-cn.vnnox.com/request-limit/add",
+		"au": "https://prometheus-kong-au.vnnox.com/request-limit/add",
+	}
 )
 
 func init() {
@@ -47,7 +54,15 @@ type KongRule struct {
 }
 
 // HandleSMSPrefixBlock 处理短信前缀封禁逻辑
-func HandleSMSPrefixBlock(prefix string) error {
+func HandleSMSPrefixBlock(prefix string, region string) error {
+	// 根据region获取对应的Kong API endpoint
+	endpoint, exists := regionEndpoints[region]
+	if !exists {
+		// 如果region不存在，使用默认endpoint
+		fmt.Printf("Warning: Unknown region %s, using default endpoint\n", region)
+		endpoint = kongAPIEndpoint
+	}
+
 	// 构建请求体
 	rule := KongRule{
 		Action: "add",
@@ -77,7 +92,7 @@ func HandleSMSPrefixBlock(prefix string) error {
 	}
 
 	// 创建请求
-	req, err := http.NewRequest("POST", kongAPIEndpoint, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
 	if err != nil {
 		return fmt.Errorf("create request failed: %v", err)
 	}

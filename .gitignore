@@ -3,3 +3,4 @@ bin/
 .vscode
 alertmanager.yaml
 alertexample.josn
+.history

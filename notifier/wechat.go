@@ -77,8 +77,13 @@ func Send(notification model.Notification, defaultRobot string, grafanaURL strin
 		for _, alert := range notification.Alerts {
 			if prefix, ok := alert.Labels["prefix"]; ok && prefix != "" {
 				fmt.Printf("The prefix for kong is : %s\n", prefix)
+				// 获取region，如果没有设置则使用默认值
+				region := alert.Labels["region"]
+				if region == "" {
+					region = "cn" // 设置默认region为cn
+				}
 				// 调用Kong API进行封禁
-				if err := HandleSMSPrefixBlock(prefix); err != nil {
+				if err := HandleSMSPrefixBlock(prefix, region); err != nil {
 					fmt.Printf("Failed to block SMS prefix: %v\n", err)
 				} else {
 					// 发送封禁成功通知
